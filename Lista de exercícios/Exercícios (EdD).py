@@ -13,21 +13,8 @@ if n1 > 0:
 else:
     print("O número apresentado é negativo")
 
-# Question 3: Faça um Programa que verifique se uma letra digitada é "F" ou "M". Conforme a letra escrever: F - Feminino, M - Masculino, Sexo Inválido.
-    
 
-
-
-
-
-
-# Question 4: Faça um Programa que verifique se uma letra digitada é vogal ou consoante.
-
-
-
-
-
-''' Question 5: Faça um programa para a leitura de duas notas parciais de um aluno. O programa deve calcular a média alcançada por aluno e apresentar:
+''' Question 3: Faça um programa para a leitura de duas notas parciais de um aluno. O programa deve calcular a média alcançada por aluno e apresentar:
 
 A mensagem "Aprovado", se a média alcançada for maior ou igual a sete;
 A mensagem "Reprovado", se a média for menor do que sete;
@@ -45,21 +32,3 @@ elif M < 7:
 
 elif M == 10:
     print("Aprovado com distinção")
-
-
-
-
-
-
-
-
-# Question 6: Faça um Programa que leia três números e mostre o maior deles.
-
-
-
-
-
-
-
-
-# Question 7: Faça um Programa que leia três números e mostre o maior e o menor deles.
