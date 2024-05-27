@@ -1,9 +1,5 @@
 #Somando números - Desafio 003
-n = int(input('Digite um número:'))
-n2 = int(input('Digite outro número:'))
+n = int(input('Digite um número: '))
+n2 = int(input('Digite outro número: '))
 soma = n + n2
-print(f'A soma dos números {n} e {n2} é igual a {soma}')
-
-#O código acima foi aprimorado com uso de f string e inserção de inteiros
-
-    
+print(f'A soma dos números \033[32m{n}\033[m e\033[m \033[32m{n2}\033[m é igual a \033[31m{soma}\033[m')

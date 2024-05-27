@@ -1,2 +1,2 @@
 #Olá, Mundo! - Desafio 001
-print("Hello World")
+print("\033[36mHello World\033[m")
