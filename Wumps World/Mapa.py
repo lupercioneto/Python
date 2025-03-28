@@ -36,7 +36,6 @@ class Mapa():
             return x, y
             
 
-
     def Is_Adjacent_To_Player(self, x, y):
         """Verifica se a posição (x, y) está ao lado da posição inicial do jogador"""
 
@@ -50,7 +49,7 @@ class Mapa():
                 return True
         return False
 
-
+    # Gera um Gold
     def Generate_Gold(self, pits_positions, wumpus_pos):
         """Gera 1 (um) Gold (Ouro) em uma posição aleatória do mapa;"""
 
@@ -59,7 +58,7 @@ class Mapa():
            if (x, y) != self.PLAYER_START_POS and (x, y) not in pits_positions and (x, y) != wumpus_pos:    
                 return x, y
 
-
+    # Gera pits
     def Generate_Pits(self, pits: int, wumpus_pos):
         """Gera Pits (Buracos) em posições aleatórias do mapa.
         Também realiza verificações a fim de evitar sobreposições de elementos"""
@@ -74,7 +73,7 @@ class Mapa():
         
         return list(pit_positions)
 
-
+    # Verifica se o wumpus não está cercado por buracos
     def Is_Wumpus_Locked(self, wumpus_pos, tamanho: int, pits):
         """Verifica se o Wumpus tem algum espaço livre para fugir
         (Se não está cercado de buracos)"""
@@ -89,7 +88,7 @@ class Mapa():
                     free_spaces += 1
         return free_spaces == 0  # Está preso se não houver espaços livres
 
-
+    # Gera um Wumpus
     def Generate_Wumpus(self, min_distance=2):
         """Gera um Wumpus em uma posição aleatória do mapa;
         Também realiza verificações a fim de evitar sobreposições de elementos"""
@@ -107,9 +106,8 @@ class Mapa():
             if distancia_player >= min_distance:
                 if (x, y) != self.PLAYER_START_POS and not self.Is_Adjacent_To_Player(x, y):
                     return (x, y)
-        
 
-
+    # Mostra o mapa visível ao jogador
     def Show_Map(self):
         """ Mostra o mapa visível para o jogador"""
         print()

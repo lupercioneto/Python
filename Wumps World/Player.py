@@ -5,15 +5,18 @@ from time import sleep
 class Player():
 
 
-    def __init__(self, mapa):
+    def __init__(self, mapa, player_nick):
+        self.player_score = 0 # É atualizado conforme as ações que faz no mapa (andar, pegar gold, morrer)
+        self.nickname = player_nick
         self.mapa = mapa
         self.x, self.y = 0, 0  # Começa no canto superior esquerdo
         self.vivo = True
         self.ouro_coletado = False
         self.mapa.visible_map[self.x][self.y] = "\U0001F93A"  # Marca a posição inicial do player
         self.__wumpus_position = self.mapa._map["W"]
+    
 
-
+    # Move o player para uma das 4 direções
     def Move(self, direcao):
         """ Move o personagem no mapa e verifica interações com outros elementos"""
         if not self.vivo:
@@ -21,17 +24,18 @@ class Player():
             return
 
         old_x, old_y = self.x, self.y
+        self.player_score -= 7 # Cada passo diminue pontuação. Quanto mais andar, mais penalizado player será
 
-        if direcao == "W" and self.x > 0:  # Cima
+        if direcao == "W" and self.x > 0:  # Andar para cima
             self.x -= 1
             
-        elif direcao == "S" and self.x < self.mapa.tamanho - 1:  # Baixo
+        elif direcao == "S" and self.x < self.mapa.tamanho - 1:  # Andar para baixo
             self.x += 1
 
-        elif direcao == "A" and self.y > 0:  # Esquerda
+        elif direcao == "A" and self.y > 0:  # Andar para a esquerda
             self.y -= 1 
 
-        elif direcao == "D" and self.y < self.mapa.tamanho - 1:  # Direita
+        elif direcao == "D" and self.y < self.mapa.tamanho - 1:  # Andar para a direita
             self.y += 1
         else:
             print("Movimento inválido!")
@@ -47,7 +51,23 @@ class Player():
 
         self.Verify_Pos()
 
+    # Ataca uma linha/coluna
+    def attack_with_bow(self, direction):
+        # Inicia o processo de ataque com arco e flecha contra o Wumpus
+        if self.wumpus_is_dead():
+            print("\U0001F9E0 Você repensa e decide não gastar uma de suas preciosas flechas.")
 
+        elif self.Try_Attack_Wumpus(direction):
+            print("\U0001FA78 Você acertou um tiro fatal em Wumpus! Agora ele está morto.\n")
+            self.player_score += 900
+
+        else:
+            self.move_wumpus_randomly()
+            print("Você ouviu a flechar atingir uma parede. \nO Wumpus percebe sua intenção e se move \U0001F47E.\n")
+            print("- 200 pontos")
+            self.player_score -= 200
+
+    # Verifica se determinada coordenada contém um wumpus e mata ele
     def Wumpus_pierced_by_arrow(self, target_x, target_y):
         pierced = False
 
@@ -59,15 +79,16 @@ class Player():
             self.__wumpus_position = "Tomb"
             self.mapa.visible_map[target_x][target_y] = "\U0001F940" # Mostra o wumpus morto ao jogador
             
-        return pierced
-        # Se não acertar o Wumpus, ele se move para uma casa aleatória do mapa (Vá para Was_Wumpus_Fainted)
+        return pierced  # Se não acertar o Wumpus, ele se move para uma casa aleatória do mapa (Vá para Was_Wumpus_Fainted)
+       
 
-
+    # Verifica se o wumpus está morto
     def wumpus_is_dead(self):
         return self.__wumpus_position == "Tomb"   
 
 
-    def Was_Wumpus_Fainted(self, typeDir):
+    # Percorre a linha/coluna vendo se o wumpus esta lá
+    def Try_Attack_Wumpus(self, typeDir):
         """
         Ataca o Wumpus com um arco e flecha, verificando se ele está na linha ou coluna
         na direção especificada.
@@ -114,19 +135,7 @@ class Player():
             return was_fainted
         
 
-    def attack_with_bow(self, direction):
-        if self.wumpus_is_dead():
-            print("\U0001F9E0 Você repensa e decide não gastar uma de suas preciosas flechas.")
-
-        elif self.Was_Wumpus_Fainted(direction):
-            print("\U0001FA78 Você acertou um tiro fatal em Wumpus! Agora ele está morto.\n")
-        
-        else:
-            self.move_wumpus_randomly()
-            print("Você ouviu a flechar atingir uma parede. \nO Wumpus percebe sua intenção e se move \U0001F47E.\n")
-
-
-
+    # Altera a posição do wumpus 
     def move_wumpus_randomly(self):
         """Move o Wumpus para uma posição aleatória no mapa"""
         if self.wumpus_is_dead():
@@ -141,7 +150,7 @@ class Player():
             # Garante que o Wumpus não se mova para a posição do jogador, do ouro ou de buracos
             if (new_x, new_y) != (self.x, self.y) and (new_x, new_y) != self.mapa._map["G"] and (new_x, new_y) not in self.mapa._map["B"]:
                 self.mapa._map["W"] = (new_x, new_y)
-                self.wumpus_position = (new_x, new_y) 
+                self.__wumpus_position = (new_x, new_y) 
                 self.Verify_Perceptions() # Caso Wumpus spawne em adjacentes, o player seja avisado
                 break
             trys += 1
@@ -151,6 +160,7 @@ class Player():
             return
 
 
+    # Verifica o que há na nova posição do player
     def Verify_Pos(self):
         """Verifica a posição que Player acabou de pisar
         -> Se houver um Wumpus ou um Pit, ele perde;
@@ -159,6 +169,8 @@ class Player():
         if (self.x, self.y) == self.mapa._map["G"]:
             self.ouro_coletado = True
             print("\U0001F389 Você encontrou o ouro! Agora saia da caverna.")
+            print("+1000 pontos \U00002728")
+            self.player_score += 1000
             self.mapa._map["G"] = None # Retira o ouro daquela posição, pois já foi coletado   
 
         elif (self.x, self.y) == self.mapa._map["W"]:
@@ -174,6 +186,8 @@ class Player():
                 
                 self.mapa.Show_Map() 
                 print("\U0001F480 Você foi devorado pelo Wumpus!")
+                print("- 700 pontos \U0000274C")
+                self.player_score -= 700
                 return 
 
         elif (self.x, self.y) in self.mapa._map["B"]:
@@ -182,11 +196,14 @@ class Player():
 
             self.mapa.Show_Map()
             print("Você caiu em um buraco! \U0001F573")
-            return 
+            print("- 300 pontos")
+            self.player_score -= 300
+            return
         
         self.Verify_Perceptions()
 
 
+    # Verifica se as adjacentes tem alguma percepção (brisa, wumpus)
     def Verify_Perceptions(self):
         """Verifica o que há por perto, em casas adjacentes ao Player"""
     
@@ -200,8 +217,9 @@ class Player():
 
         for msg in perigo:
             print(msg)
-            sleep(0.8)
+        sleep(0.1)
 
 
+    # Mostra a posição atual do player
     def Show_Pos(self):
         print(f"\U0001F4CD Posição atual: ({self.x}, {self.y})")
